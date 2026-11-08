@@ -12,16 +12,22 @@ export default function StatusSelect({
   status: string;
 }) {
   const router = useRouter();
+
   async function change(value: Status) {
     if (
       (value === "confirmed" || value === "declined") &&
-      !confirm(`Mark as ${value}? The guest will be emailed.`)
+      !confirm(
+        `Mark as ${value}? Then click the Email button to notify the guest.`,
+      )
     )
       return;
+
     const res = await setBookingStatus(id, value);
     if (!res.ok) return alert(res.error);
+
     router.refresh();
   }
+
   return (
     <select
       className={`status st-${status}`}
