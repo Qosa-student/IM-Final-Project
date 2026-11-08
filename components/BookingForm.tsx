@@ -1,7 +1,7 @@
 "use client";
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { createBooking } from "@/app/actions";
 import type { Room } from "@/lib/types";
 
 function today() {
@@ -50,22 +50,19 @@ export default function BookingForm({
       );
 
     setBusy(true);
-    const { error: dbErr } = await createClient()
-      .from("bookings")
-      .insert({
-        user_id: userId,
-        room_id: room.id,
-        guest_name: String(f.get("name")),
-        email: String(f.get("email")),
-        phone: String(f.get("phone")),
-        check_in: checkIn,
-        check_out: isRoom ? checkOut : checkIn,
-        guests,
-        notes: String(f.get("notes") || "") || null,
-      });
-    if (dbErr) {
+    const res = await createBooking({
+      room_id: room.id,
+      guest_name: String(f.get("name")),
+      email: String(f.get("email")),
+      phone: String(f.get("phone")),
+      check_in: checkIn,
+      check_out: isRoom ? checkOut : checkIn,
+      guests,
+      notes: String(f.get("notes") || "") || null,
+    });
+    if (!res.ok) {
       setBusy(false);
-      return setError(dbErr.message);
+      return setError(res.error);
     }
     router.push("/account/bookings?sent=1");
     router.refresh();

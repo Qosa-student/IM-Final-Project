@@ -1,6 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { setBookingStatus } from "@/app/actions";
+
+type Status = "pending" | "confirmed" | "declined" | "cancelled";
 
 export default function StatusSelect({
   id,
@@ -10,19 +12,21 @@ export default function StatusSelect({
   status: string;
 }) {
   const router = useRouter();
-  async function change(value: string) {
-    const { error } = await createClient()
-      .from("bookings")
-      .update({ status: value })
-      .eq("id", id);
-    if (error) return alert(error.message);
+  async function change(value: Status) {
+    if (
+      (value === "confirmed" || value === "declined") &&
+      !confirm(`Mark as ${value}? The guest will be emailed.`)
+    )
+      return;
+    const res = await setBookingStatus(id, value);
+    if (!res.ok) return alert(res.error);
     router.refresh();
   }
   return (
     <select
       className={`status st-${status}`}
       value={status}
-      onChange={(e) => change(e.target.value)}
+      onChange={(e) => change(e.target.value as Status)}
     >
       <option value="pending">Pending</option>
       <option value="confirmed">Confirmed</option>

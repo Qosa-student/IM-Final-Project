@@ -4,11 +4,14 @@ import AboutPhoto from "@/components/AboutPhoto";
 import AmenityGrid from "@/components/AmenityGrid";
 import RoomCard from "@/components/RoomCard";
 import { getRooms } from "@/lib/rooms";
+import ReviewsSection from "@/components/ReviewsSection";
+import JsonLd from "@/components/JsonLd";
 
 export default async function Home() {
   const rooms = await getRooms(2);
   return (
     <>
+      <JsonLd />
       <section className="hero home">
         <div className="hero-inner">
           <p className="kicker">Welcome to Paradise</p>
@@ -60,6 +63,8 @@ export default async function Home() {
         <h2>Everything You Need</h2>
         <AmenityGrid />
       </section>
+
+      <ReviewsSection />
 
       <section className="contact-strip">
         <h3>Contact Us</h3>

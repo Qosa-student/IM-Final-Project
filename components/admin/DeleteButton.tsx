@@ -7,7 +7,7 @@ export default function DeleteButton({
   id,
   label,
 }: {
-  table: "rooms" | "messages" | "bookings" | "gallery_images";
+  table: "rooms" | "messages" | "bookings" | "gallery_images" | "reviews";
   id: number;
   label: string;
 }) {

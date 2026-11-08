@@ -7,6 +7,7 @@ const items = [
   { href: "/admin/rooms", label: "Rooms" },
   { href: "/admin/bookings", label: "Bookings" },
   { href: "/admin/messages", label: "Messages" },
+  { href: "/admin/reviews", label: "Reviews" },
   { href: "/admin/gallery", label: "Gallery" },
 ];
 

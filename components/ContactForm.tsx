@@ -1,6 +1,6 @@
 "use client";
 import { useState, type FormEvent } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { sendMessage } from "@/app/actions";
 
 export default function ContactForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
@@ -12,15 +12,13 @@ export default function ContactForm() {
     const form = e.currentTarget;
     const f = new FormData(form);
     setStatus("sending");
-    const { error } = await createClient()
-      .from("messages")
-      .insert({
-        name: f.get("name"),
-        email: f.get("email"),
-        subject: f.get("subject"),
-        message: f.get("message"),
-      });
-    if (error) return setStatus("error");
+    const res = await sendMessage({
+      name: String(f.get("name")),
+      email: String(f.get("email")),
+      subject: String(f.get("subject") || ""),
+      message: String(f.get("message")),
+    });
+    if (!res.ok) return setStatus("error");
     form.reset();
     setStatus("sent");
   }

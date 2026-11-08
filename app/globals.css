@@ -1367,3 +1367,81 @@ main {
 .admin tr.unread td:first-child {
   box-shadow: inset 4px 0 0 var(--purple);
 }
+/* legal pages */
+.legal {
+  max-width: 760px;
+  margin-inline: auto;
+}
+.legal h2 {
+  font-size: 1.4rem;
+  margin: 2rem 0 0.5rem;
+}
+.legal p {
+  margin-bottom: 0.8rem;
+}
+.legal a {
+  color: var(--purple);
+}
+.legal a:hover {
+  text-decoration: underline;
+}
+
+/* reviews */
+.reviews {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 2rem auto;
+  text-align: left;
+}
+.review {
+  background: #fff;
+  border: 2px solid #333;
+  border-radius: 16px;
+  padding: 1.2rem 1.4rem;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.review:hover {
+  border-color: var(--purple);
+  box-shadow: 0 10px 24px rgba(79, 53, 232, 0.15);
+}
+.review p {
+  margin: 0.6rem 0;
+}
+.review small {
+  color: #666;
+}
+.stars {
+  color: #e0a800;
+  letter-spacing: 2px;
+}
+.review-form {
+  margin: 2rem auto 0;
+  text-align: left;
+}
+.review-form h3 {
+  font-size: 1.3rem;
+}
+.star-pick {
+  display: flex;
+  gap: 0.2rem;
+}
+.star-pick button {
+  background: none;
+  border: 0;
+  font-size: 2rem;
+  line-height: 1;
+  color: #ccc;
+  transition:
+    color 0.15s,
+    transform 0.15s;
+}
+.star-pick button.on {
+  color: #e0a800;
+}
+.star-pick button:hover {
+  transform: scale(1.15);
+}
