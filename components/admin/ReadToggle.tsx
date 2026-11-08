@@ -11,10 +11,11 @@ export default function ReadToggle({
 }) {
   const router = useRouter();
   async function toggle() {
-    await createClient()
+    const { error } = await createClient()
       .from("messages")
       .update({ is_read: !isRead })
       .eq("id", id);
+    if (error) return alert(error.message);
     router.refresh();
   }
   return (

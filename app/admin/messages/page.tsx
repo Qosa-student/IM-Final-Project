@@ -24,9 +24,14 @@ export default async function AdminMessages() {
         <tbody>
           {messages?.length ? (
             messages.map((m) => (
-              <tr key={m.id} className={m.is_read ? "" : "unread"}>
+              <tr key={m.id} className={m.is_read ? "read-row" : "unread"}>
                 <td>
-                  {!m.is_read && <span className="badge">New</span>} {m.name}
+                  {m.is_read ? (
+                    <span className="badge read">✓ Read</span>
+                  ) : (
+                    <span className="badge">New</span>
+                  )}{" "}
+                  {m.name}
                   <br />
                   <small>{m.email}</small>
                 </td>

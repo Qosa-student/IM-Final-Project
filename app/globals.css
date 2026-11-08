@@ -1355,3 +1355,15 @@ main {
     height: 320px;
   }
 }
+/* read / unread messages */
+.badge.read {
+  background: #dff3e4;
+  color: #0a7a3d;
+}
+.read-row td {
+  color: #777;
+  font-weight: 400;
+}
+.admin tr.unread td:first-child {
+  box-shadow: inset 4px 0 0 var(--purple);
+}
