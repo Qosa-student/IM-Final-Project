@@ -1,13 +1,18 @@
 import { User, BedDouble, Maximize, Table, Armchair } from "lucide-react";
+import { roomImage } from "@/lib/image";
 import type { Room } from "@/lib/types";
+import Link from "next/link";
 
 export default function RoomCard({ room }: { room: Room }) {
   const isRoom = room.category === "room";
+  const src = roomImage(room.image);
   return (
     <article className="card">
       <div className="card-img">
-        {room.image && (
-          <img src={`/images/rooms/${room.image}`} alt={room.name} />
+        {src ? (
+          <img src={src} alt={room.name} />
+        ) : (
+          <div className="ph">{room.name}</div>
         )}
       </div>
       <div className="card-body">
@@ -41,9 +46,9 @@ export default function RoomCard({ room }: { room: Room }) {
           ₱{Number(room.price).toLocaleString()}
           {isRoom && <span> /night</span>}
         </p>
-        <a href="/contact" className="btn">
+        <Link href={`/rooms/${room.id}`} className="btn">
           View Details
-        </a>
+        </Link>
       </div>
     </article>
   );

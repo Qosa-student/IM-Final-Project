@@ -3,15 +3,15 @@ export default function AboutPhoto() {
     <div className="about-photo">
       <img
         className="main"
-        src="/images/about-garden.jpg"
+        src="/images/about-garden.png"
         alt="Resort garden pathway"
       />
-      <img
-        className="polaroid"
-        src="/images/about-sunset.jpg"
-        alt="Sunset at the resort"
-      />
-      <img className="badge" src="/images/logo-circle.png" alt="" />
+      <span className="polaroid">
+        <img src="/images/about-sunset.png" alt="Sunset at the resort" />
+      </span>
+      <span className="badge">
+        <img src="/images/logo-circle.png" alt="" />
+      </span>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { Phone, Mail, MapPin, Facebook, Instagram } from "lucide-react";
 import ContactForm from "@/components/ContactForm";
 import PageHero from "@/components/PageHero";
+import ContactMap from "@/components/ContactMap";
 
 export const metadata = { title: "Contact | D’Bay Samal" };
 
@@ -46,6 +47,7 @@ export default function Contact() {
           </div>
         </aside>
         <ContactForm />
+        <ContactMap />
       </section>
     </>
   );

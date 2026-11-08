@@ -13,7 +13,7 @@ export default function PageHero({
     <section className={`hero ${tall ? "tall" : ""}`}>
       <div className="hero-inner">
         <h1>{title}</h1>
-        <img className="hero-icon" src="/images/island-icon.svg" alt="" />
+        <img className="hero-icon" src="/images/island-icon.png" alt="" />
         <p>{children}</p>
       </div>
     </section>

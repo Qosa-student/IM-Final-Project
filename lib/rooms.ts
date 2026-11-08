@@ -12,7 +12,7 @@ const fallback: Room[] = [
     tables_count: null,
     chairs: null,
     price: 3500,
-    image: "executive.jpg",
+    image: "executive.png",
     sort: 1,
   },
   {
@@ -25,7 +25,7 @@ const fallback: Room[] = [
     tables_count: null,
     chairs: null,
     price: 4500,
-    image: "dorm-4.jpg",
+    image: "dorm-4.png",
     sort: 2,
   },
   {
@@ -38,7 +38,7 @@ const fallback: Room[] = [
     tables_count: null,
     chairs: null,
     price: 5500,
-    image: "dorm-8.jpg",
+    image: "dorm-8.png",
     sort: 3,
   },
   {
@@ -51,7 +51,7 @@ const fallback: Room[] = [
     tables_count: 2,
     chairs: 10,
     price: 500,
-    image: "bench.jpg",
+    image: "bench.png",
     sort: 4,
   },
   {
@@ -64,7 +64,7 @@ const fallback: Room[] = [
     tables_count: 2,
     chairs: 10,
     price: 800,
-    image: "cottage-8.jpg",
+    image: "cottage-8.png",
     sort: 5,
   },
   {
@@ -77,7 +77,7 @@ const fallback: Room[] = [
     tables_count: 6,
     chairs: 25,
     price: 1500,
-    image: "cottage-20.jpg",
+    image: "cottage-20.png",
     sort: 6,
   },
 ];

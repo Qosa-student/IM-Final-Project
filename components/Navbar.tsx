@@ -8,6 +8,7 @@ const links = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About Us" },
   { href: "/rooms", label: "Rooms" },
+  { href: "/gallery", label: "Gallery" },
   { href: "/amenities", label: "Amenities" },
   { href: "/contact", label: "Contact" },
 ];
@@ -16,13 +17,26 @@ export default function Navbar() {
   const path = usePathname();
   const router = useRouter();
   const [signedIn, setSignedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => setSignedIn(!!data.user));
+
+    async function load(userId?: string) {
+      setSignedIn(!!userId);
+      if (!userId) return setIsAdmin(false);
+      const { data } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", userId)
+        .single();
+      setIsAdmin(data?.role === "admin");
+    }
+
+    supabase.auth.getUser().then(({ data }) => load(data.user?.id));
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) =>
-      setSignedIn(!!s?.user),
+      load(s?.user?.id),
     );
     return () => sub.subscription.unsubscribe();
   }, []);
@@ -33,10 +47,17 @@ export default function Navbar() {
     router.refresh();
   }
 
+  const isActive = (href: string) =>
+    href === "/" ? path === "/" : path.startsWith(href);
+
   return (
     <header className="nav">
-      <Link href="/" className="brand">
-        <img src="/images/logo.png" alt="D'Bay Samal Beach & Resort" />
+      <Link href="/" className="brand" aria-label="D’Bay Samal Beach & Resort">
+        <img src="/images/logo.png" alt="" />
+        <span className="brand-text">
+          <strong>D’Bay Samal</strong>
+          <small>Beach &amp; Resort</small>
+        </span>
       </Link>
       <button
         className="burger"
@@ -50,11 +71,20 @@ export default function Navbar() {
           <Link
             key={l.href}
             href={l.href}
-            className={path === l.href ? "active" : ""}
+            className={isActive(l.href) ? "active" : ""}
           >
             {l.label}
           </Link>
         ))}
+        {signedIn && !isAdmin && (
+          <Link
+            href="/account/bookings"
+            className={isActive("/account") ? "active" : ""}
+          >
+            My Bookings
+          </Link>
+        )}
+        {isAdmin && <Link href="/admin">Admin</Link>}
         {signedIn ? (
           <button className="linkbtn" onClick={logout}>
             Logout

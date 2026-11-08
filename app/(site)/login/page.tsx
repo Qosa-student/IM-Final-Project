@@ -54,7 +54,10 @@ export default function Login() {
       .select("role")
       .eq("id", user!.id)
       .single();
-    router.push(profile?.role === "admin" ? "/admin" : "/");
+    const next = new URLSearchParams(window.location.search).get("next");
+    const safeNext =
+      next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+    router.push(profile?.role === "admin" ? "/admin" : safeNext);
     router.refresh();
   }
 

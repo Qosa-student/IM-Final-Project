@@ -10,5 +10,6 @@ export type Room = {
   price: number;
   image: string | null;
   sort: number;
+  description?: string | null;
 };
 export type Role = "user" | "admin";
