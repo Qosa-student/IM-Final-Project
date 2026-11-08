@@ -110,6 +110,7 @@ export async function setBookingStatus(id: number, status: Status) {
 
   if (status === "confirmed" || status === "declined") {
     const room = b.rooms as unknown as { name: string } | null;
+    const roomName = esc(room?.name ?? "your stay");
     const dates =
       b.check_out !== b.check_in
         ? `${b.check_in} to ${b.check_out}`
@@ -122,8 +123,16 @@ export async function setBookingStatus(id: number, status: Status) {
           : "About your booking request",
       html:
         status === "confirmed"
-          ? `<p>Hi ${esc(b.guest_name)},</p><p>Good news! Your booking for ${esc(room?.name ?? "your stay")} (${dates}) is <b>confirmed</b>.</p><p>We look forward to welcoming you.</p><p>D’Bay Samal Beach &amp; Resort</p>`
-          : `<p>Hi ${esc(b.guest_name)},</p><p>Sorry, we can’t accommodate your request for ${esc(room?.name ?? "your stay")} (${dates}). Please contact us to find other dates.</p><p>D’Bay Samal Beach &amp; Resort</p>`,
+          ? `<p>Hi ${esc(b.guest_name)},</p>
+           <p>Good news! Your booking for <b>${roomName}</b> (${dates}) is <b>confirmed</b>.</p>
+           <p><b>Check-in:</b> from 2:00 PM<br />
+           <b>Check-out:</b> until 12:00 NN</p>
+           <p>Please bring a valid ID when you arrive.</p>
+           <p>Need to change something? Call us at 09086776094 or reply to this email.</p>
+           <p>We look forward to welcoming you!<br />D’Bay Samal Beach &amp; Resort</p>`
+          : `<p>Hi ${esc(b.guest_name)},</p>
+           <p>Sorry, we can’t accommodate your request for <b>${roomName}</b> (${dates}). Please contact us at 09086776094 to find other dates.</p>
+           <p>D’Bay Samal Beach &amp; Resort</p>`,
     });
   }
   return { ok: true as const };
