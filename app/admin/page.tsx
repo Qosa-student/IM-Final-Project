@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BedDouble, CalendarDays, Users } from "lucide-react";
 import { fmtDate } from "@/lib/format";
+import { getRoomName } from "@/lib/relations";
 import { createClient } from "@/lib/supabase/server";
 
 function Stat({
@@ -91,7 +92,7 @@ export default async function Dashboard() {
               recent.map((b) => (
                 <tr key={b.id}>
                   <td>{b.guest_name}</td>
-                  <td>{b.rooms?.name ?? "Removed room"}</td>
+                  <td>{getRoomName(b.rooms) ?? "Removed room"}</td>
                   <td>
                     {fmtDate(b.check_in)}
                     {b.check_out !== b.check_in && ` → ${fmtDate(b.check_out)}`}

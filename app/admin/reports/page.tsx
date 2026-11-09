@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getRoomName } from "@/lib/relations";
 
 type Point = { label: string; value: number };
 
@@ -76,7 +77,7 @@ export default async function Reports() {
 
   const byRoom: Record<string, number> = {};
   bookings?.forEach((b) => {
-    const n = b.rooms?.name ?? "Removed room";
+    const n = getRoomName(b.rooms) ?? "Removed room";
     byRoom[n] = (byRoom[n] ?? 0) + 1;
   });
   const topRooms = Object.entries(byRoom)

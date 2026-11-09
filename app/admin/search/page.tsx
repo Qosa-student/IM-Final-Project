@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getRoomName } from "@/lib/relations";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function Search({
@@ -55,7 +56,7 @@ export default async function Search({
             {bookings.map((b) => (
               <li key={b.id}>
                 <Link href="/admin/bookings">
-                  {b.guest_name} · {b.rooms?.name ?? "Room"} · {b.status}
+                  {b.guest_name} · {getRoomName(b.rooms) ?? "Room"} · {b.status}
                   <small> {b.email}</small>
                 </Link>
               </li>

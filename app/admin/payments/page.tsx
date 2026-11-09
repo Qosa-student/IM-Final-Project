@@ -1,6 +1,7 @@
 import DeleteButton from "@/components/admin/DeleteButton";
 import PaymentForm from "@/components/admin/PaymentForm";
 import { fmtDate } from "@/lib/format";
+import { getRoomName } from "@/lib/relations";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function Payments() {
@@ -42,7 +43,7 @@ export default async function Payments() {
       <PaymentForm
         bookings={(bookings ?? []).map((b) => ({
           id: b.id,
-          label: `${b.guest_name} · ${b.rooms?.name ?? "Room"} · ₱${Number(b.total).toLocaleString()}`,
+          label: `${b.guest_name} · ${getRoomName(b.rooms) ?? "Room"} · ₱${Number(b.total).toLocaleString()}`,
         }))}
       />
 
@@ -65,7 +66,7 @@ export default async function Payments() {
               <tr key={p.id}>
                 <td>{fmtDate(p.paid_at)}</td>
                 <td>{p.bookings?.guest_name ?? "—"}</td>
-                <td>{p.bookings?.rooms?.name ?? "—"}</td>
+                <td>{getRoomName(p.bookings?.rooms) ?? "—"}</td>
                 <td style={{ textTransform: "capitalize" }}>{p.method}</td>
                 <td>₱{Number(p.amount).toLocaleString()}</td>
                 <td>{p.note}</td>
