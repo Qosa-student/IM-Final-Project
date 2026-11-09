@@ -89,7 +89,7 @@ export default function LoginForm({ next }: { next: string }) {
 
   return (
     <>
-      <h1 className="lp-pill">
+      <h1 className="sr-only">
         {mode === "login" ? "Sign In" : "Create Account"}
       </h1>
       <p className="lp-sub">

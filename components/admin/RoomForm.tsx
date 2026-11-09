@@ -57,6 +57,7 @@ export default function RoomForm({ room }: { room?: Room }) {
       size_sqm: isRoom ? num(f.get("size_sqm")) : null,
       tables_count: isRoom ? null : num(f.get("tables_count")),
       chairs: isRoom ? null : num(f.get("chairs")),
+      units: num(f.get("units")) ?? 1,
     };
     const { error: dbErr } = room
       ? await supabase.from("rooms").update(payload).eq("id", room.id)
@@ -150,6 +151,16 @@ export default function RoomForm({ room }: { room?: Room }) {
           type="number"
           min={0}
           defaultValue={room?.price}
+          required
+        />
+      </label>
+      <label>
+        Units available (how many identical rooms)
+        <input
+          name="units"
+          type="number"
+          min={1}
+          defaultValue={room?.units ?? 1}
           required
         />
       </label>

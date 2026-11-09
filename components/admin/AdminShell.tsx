@@ -6,6 +6,7 @@ import {
   BarChart3,
   BedDouble,
   CalendarDays,
+  CalendarRange,
   ChevronDown,
   House,
   Images,
@@ -25,6 +26,7 @@ import NotificationBell, {
 import { createClient } from "@/lib/supabase/client";
 
 const nav = [
+  { href: "/admin/calendar", label: "Booking Calendar", icon: CalendarRange },
   { href: "/admin", label: "Dashboard", icon: House },
   { href: "/admin/bookings", label: "Booking Management", icon: CalendarDays },
   { href: "/admin/rooms", label: "Room Management", icon: BedDouble },

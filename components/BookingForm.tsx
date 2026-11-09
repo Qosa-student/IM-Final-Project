@@ -1,7 +1,7 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { createBooking } from "@/app/actions";
+import { checkAvailability, createBooking } from "@/app/actions";
 import type { Room } from "@/lib/types";
 
 function today() {
@@ -12,7 +12,6 @@ function today() {
 
 export default function BookingForm({
   room,
-  userId,
   defaultName,
   defaultEmail,
 }: {
@@ -23,18 +22,37 @@ export default function BookingForm({
 }) {
   const router = useRouter();
   const isRoom = room.category === "room";
+  const unit = isRoom ? "night" : "day";
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [avail, setAvail] = useState<{
+    available: boolean;
+    left: number | null;
+  } | null>(null);
 
-  const nights =
-    isRoom && checkIn && checkOut
+  const diff =
+    checkIn && checkOut
       ? Math.round((+new Date(checkOut) - +new Date(checkIn)) / 86400000)
-      : 0;
-  const total = isRoom
-    ? Math.max(nights, 0) * Number(room.price)
-    : Number(room.price);
+      : -1;
+  const valid = diff >= (isRoom ? 1 : 0);
+  const billed = valid ? Math.max(diff, 1) : 0;
+  const total = billed * Number(room.price);
+
+  useEffect(() => {
+    if (!checkIn || !checkOut || !valid) {
+      setAvail(null);
+      return;
+    }
+    let cancelled = false;
+    checkAvailability(room.id, checkIn, checkOut).then((r) => {
+      if (!cancelled) setAvail(r);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [room.id, checkIn, checkOut, valid]);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -42,8 +60,13 @@ export default function BookingForm({
     const guests = Number(f.get("guests"));
     setError("");
 
-    if (isRoom && nights < 1)
-      return setError("Check-out must be at least one day after check-in.");
+    if (!valid) {
+      return setError(
+        isRoom
+          ? "Check-out must be at least one day after check-in."
+          : "Check-out can’t be before check-in. Use the same date for a day visit.",
+      );
+    }
     if (guests > room.guests)
       return setError(
         `This ${isRoom ? "room" : "cottage"} fits up to ${room.guests} guests.`,
@@ -56,7 +79,7 @@ export default function BookingForm({
       email: String(f.get("email")),
       phone: String(f.get("phone")),
       check_in: checkIn,
-      check_out: isRoom ? checkOut : checkIn,
+      check_out: checkOut,
       guests,
       notes: String(f.get("notes") || "") || null,
     });
@@ -82,32 +105,10 @@ export default function BookingForm({
         Phone
         <input name="phone" type="tel" placeholder="09XXXXXXXXX" required />
       </label>
-      {isRoom ? (
-        <div className="two-col">
-          <label>
-            Check-in
-            <input
-              type="date"
-              min={today()}
-              value={checkIn}
-              onChange={(e) => setCheckIn(e.target.value)}
-              required
-            />
-          </label>
-          <label>
-            Check-out
-            <input
-              type="date"
-              min={checkIn || today()}
-              value={checkOut}
-              onChange={(e) => setCheckOut(e.target.value)}
-              required
-            />
-          </label>
-        </div>
-      ) : (
+
+      <div className="two-col">
         <label>
-          Visit date
+          Check-in
           <input
             type="date"
             min={today()}
@@ -116,7 +117,31 @@ export default function BookingForm({
             required
           />
         </label>
+        <label>
+          Check-out
+          <input
+            type="date"
+            min={checkIn || today()}
+            value={checkOut}
+            onChange={(e) => setCheckOut(e.target.value)}
+            required
+          />
+        </label>
+      </div>
+      {!isRoom && (
+        <small className="muted">
+          Visiting for the day? Pick the same date for check-in and check-out.
+        </small>
       )}
+
+      {avail && (
+        <p className={`avail ${avail.available ? "ok" : "no"}`}>
+          {avail.available
+            ? "Good news, this is available for your dates."
+            : "Sorry, this is already booked for those dates. Please choose other dates."}
+        </p>
+      )}
+
       <label>
         Guests (max {room.guests})
         <input
@@ -136,15 +161,22 @@ export default function BookingForm({
           placeholder="Arrival time, special requests…"
         />
       </label>
-      {total > 0 && (
-        <p className="total">
-          {isRoom
-            ? `${nights} night${nights === 1 ? "" : "s"} × ₱${Number(room.price).toLocaleString()} = `
-            : "Rate: "}
-          <b>₱{total.toLocaleString()}</b>
-        </p>
-      )}
-      <button className="btn" disabled={busy}>
+
+      <p className="total">
+        {billed > 0 ? (
+          <>
+            {billed} {unit}
+            {billed === 1 ? "" : "s"} × ₱{Number(room.price).toLocaleString()} ={" "}
+            <b>₱{total.toLocaleString()}</b>
+          </>
+        ) : (
+          <>
+            Rate: <b>₱{Number(room.price).toLocaleString()}</b> per {unit}
+          </>
+        )}
+      </p>
+
+      <button className="btn" disabled={busy || avail?.available === false}>
         {busy ? "Sending…" : "Request booking"}
       </button>
       {error && <p className="err">{error}</p>}

@@ -40,7 +40,7 @@ function HBars({ data }: { data: Point[] }) {
 export default async function Reports() {
   const supabase = await createClient();
   const [{ data: bookings }, { data: payments }] = await Promise.all([
-    supabase.from("bookings").select("created_at, status, rooms(name)"),
+    supabase.from('bookings').select('*, rooms(name)'),
     supabase.from("payments").select("amount, paid_at"),
   ]);
 

@@ -1,5 +1,7 @@
+import Link from "next/link";
 import DeleteButton from "@/components/admin/DeleteButton";
 import StatusSelect from "@/components/admin/StatusSelect";
+import { overlaps } from "@/lib/dates";
 import { fmtDate } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
@@ -95,15 +97,34 @@ export default async function AdminBookings() {
   const supabase = await createClient();
   const { data: bookings } = await supabase
     .from("bookings")
-    .select("*, rooms(name)")
+    .select("*, rooms(name, units)")
     .order("created_at", { ascending: false });
+
+  const confirmed = (bookings ?? []).filter((x) => x.status === "confirmed");
+  // a pending request is in conflict when the room is already full on those dates
+  const clash = (b: {
+    id: number;
+    status: string;
+    room_id: number;
+    check_in: string;
+    check_out: string;
+    rooms: { units?: number } | null;
+  }) =>
+    b.status === "pending" &&
+    confirmed.filter((c) => c.room_id === b.room_id && overlaps(b, c)).length >=
+      (b.rooms?.units ?? 1);
 
   return (
     <>
-      <h2>Booking requests</h2>
+      <div className="admin-top">
+        <h2>Booking requests</h2>
+        <Link href="/admin/bookings/new" className="btn sm">
+          + Walk-in booking
+        </Link>
+      </div>
       <p className="muted" style={{ marginBottom: "1rem" }}>
-        Change the status, then use the email buttons to tell the guest. “Email
-        confirmation” unlocks once the booking is set to Confirmed.
+        Change the status, then use the buttons to email the guest. “Confirm
+        booking” unlocks once the booking is set to Confirmed.
       </p>
       <table>
         <thead>
@@ -127,7 +148,10 @@ export default async function AdminBookings() {
                   className={b.status === "pending" ? "unread" : ""}
                 >
                   <td>
-                    {b.guest_name}
+                    {b.guest_name}{" "}
+                    {b.source === "walk-in" && (
+                      <span className="badge walk">Walk-in</span>
+                    )}
                     <br />
                     <small>
                       {b.email}
@@ -148,44 +172,62 @@ export default async function AdminBookings() {
                   <td>{b.notes}</td>
                   <td>
                     <StatusSelect id={b.id} status={b.status} />
+                    {clash(b) && (
+                      <>
+                        <br />
+                        <span className="badge clash">Dates taken</span>
+                      </>
+                    )}
                   </td>
                   <td>
                     <div className="row-actions">
-                      <MailButton
-                        b={booking}
-                        kind="request"
-                        label="Booking request received"
-                      />
-
-                      {b.status === "confirmed" ? (
+                      {b.email && (
                         <MailButton
                           b={booking}
-                          kind="confirmed"
-                          label="Confirm booking"
+                          kind="request"
+                          label="Booking request received"
                         />
-                      ) : (
-                        <span
-                          className="btn sm outline disabled"
-                          aria-disabled="true"
-                          title="Set the status to Confirmed first"
-                        >
-                          Confirm booking
-                        </span>
                       )}
 
-                      {b.status === "declined" && (
+                      {b.email &&
+                        (b.status === "confirmed" ? (
+                          <MailButton
+                            b={booking}
+                            kind="confirmed"
+                            label="Confirm booking"
+                          />
+                        ) : (
+                          <span
+                            className="btn sm outline disabled"
+                            aria-disabled="true"
+                            title="Set the status to Confirmed first"
+                          >
+                            Confirm booking
+                          </span>
+                        ))}
+
+                      {b.email && b.status === "declined" && (
                         <MailButton
                           b={booking}
                           kind="declined"
                           label="Decline booking"
                         />
                       )}
-                      {b.status === "cancelled" && (
+                      {b.email && b.status === "cancelled" && (
                         <MailButton
                           b={booking}
                           kind="cancelled"
                           label="Cancel booking"
                         />
+                      )}
+
+                      {b.status === "confirmed" && (
+                        <Link
+                          href={`/receipt/${b.id}`}
+                          className="btn sm outline"
+                        >
+                          Receipt
+                        </Link>
                       )}
 
                       <DeleteButton

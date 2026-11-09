@@ -20,11 +20,7 @@ export default async function Search({
     { data: messages },
     { data: rooms },
   ] = await Promise.all([
-    supabase
-      .from("bookings")
-      .select("id, guest_name, email, status, rooms(name)")
-      .or(`guest_name.ilike.${like},email.ilike.${like}`)
-      .limit(8),
+    supabase.from("bookings").select("*, rooms(name)"),
     supabase
       .from("profiles")
       .select("id, full_name, email")

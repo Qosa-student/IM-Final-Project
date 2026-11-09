@@ -50,7 +50,11 @@ export default async function MyBookings({
                 </div>
                 <div className="bk-side">
                   <span className={`status st-${b.status}`}>{b.status}</span>
-                  {b.status === "pending" && <CancelButton id={b.id} />}
+                  {b.status === "confirmed" && (
+                    <Link href={`/receipt/${b.id}`} className="btn sm outline">
+                      Receipt
+                    </Link>
+                  )}
                 </div>
               </article>
             ))

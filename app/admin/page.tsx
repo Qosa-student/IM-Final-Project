@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BedDouble, CalendarDays, Users } from "lucide-react";
+import { addDays, todayPH } from "@/lib/dates";
 import { fmtDate } from "@/lib/format";
-import { getRoomName } from "@/lib/relations";
 import { createClient } from "@/lib/supabase/server";
 
 function Stat({
@@ -24,15 +24,63 @@ function Stat({
   );
 }
 
+type Item = {
+  id: number;
+  guest_name: string;
+  phone: string;
+  guests: number;
+  rooms: { name: string } | null;
+};
+
+function Remind({
+  title,
+  items,
+  empty,
+}: {
+  title: string;
+  items: Item[];
+  empty: string;
+}) {
+  return (
+    <div className="remind">
+      <h3>
+        {title} <b>{items.length}</b>
+      </h3>
+      {items.length ? (
+        <ul>
+          {items.map((b) => (
+            <li key={b.id}>
+              {b.guest_name} · {b.rooms?.name ?? "Room"}
+              <small>
+                {b.guests} guest{b.guests === 1 ? "" : "s"} ·{" "}
+                {b.phone || "no phone"}
+              </small>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="muted">{empty}</p>
+      )}
+    </div>
+  );
+}
+
 export default async function Dashboard() {
   const supabase = await createClient();
   const head = { count: "exact", head: true } as const;
+  const today = todayPH();
+  const tomorrow = addDays(today, 1);
+  const cols =
+    "id, guest_name, phone, guests, check_in, check_out, rooms(name)";
+
   const [
     { count: bookings },
     { count: rooms },
     { count: customers },
     { data: payments },
     { data: recent },
+    { data: arrivals },
+    { data: leaving },
   ] = await Promise.all([
     supabase.from("bookings").select("*", head),
     supabase.from("rooms").select("*", head),
@@ -40,11 +88,32 @@ export default async function Dashboard() {
     supabase.from("payments").select("amount"),
     supabase
       .from("bookings")
-      .select("id, guest_name, check_in, check_out, status, rooms(name)")
+      .select("*, rooms(name)")
       .order("created_at", { ascending: false })
       .limit(5),
+    supabase
+      .from("bookings")
+      .select(cols)
+      .eq("status", "confirmed")
+      .in("check_in", [today, tomorrow])
+      .order("check_in"),
+    supabase
+      .from("bookings")
+      .select(cols)
+      .eq("status", "confirmed")
+      .eq("check_out", today),
   ]);
   const revenue = (payments ?? []).reduce((s, p) => s + Number(p.amount), 0);
+
+  const arrToday = (arrivals ?? []).filter(
+    (b) => b.check_in === today,
+  ) as unknown as Item[];
+  const arrTomorrow = (arrivals ?? []).filter(
+    (b) => b.check_in === tomorrow,
+  ) as unknown as Item[];
+  const outToday = (leaving ?? []).filter(
+    (b) => b.check_out > b.check_in,
+  ) as unknown as Item[];
 
   return (
     <>
@@ -71,6 +140,24 @@ export default async function Dashboard() {
         />
       </div>
 
+      <div className="reminders">
+        <Remind
+          title="Arriving today"
+          items={arrToday}
+          empty="No arrivals today."
+        />
+        <Remind
+          title="Arriving tomorrow"
+          items={arrTomorrow}
+          empty="No arrivals tomorrow."
+        />
+        <Remind
+          title="Checking out today"
+          items={outToday}
+          empty="No check-outs today."
+        />
+      </div>
+
       <div className="recent">
         <div className="admin-top">
           <h2>Recent bookings</h2>
@@ -92,7 +179,7 @@ export default async function Dashboard() {
               recent.map((b) => (
                 <tr key={b.id}>
                   <td>{b.guest_name}</td>
-                  <td>{getRoomName(b.rooms) ?? "Removed room"}</td>
+                  <td>{b.rooms?.name ?? "Removed room"}</td>
                   <td>
                     {fmtDate(b.check_in)}
                     {b.check_out !== b.check_in && ` → ${fmtDate(b.check_out)}`}

@@ -2137,3 +2137,293 @@ main {
   padding: 0;
   font-weight: 600;
 }
+/* hidden heading (kept for screen readers) + spacing after removing the big bar */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.lp-sub {
+  margin: 0.4rem 0 1.4rem;
+  font-size: 0.85rem;
+}
+/* user settings */
+.acct {
+  max-width: 520px;
+  margin-inline: auto;
+  display: grid;
+  gap: 2rem;
+}
+.acct .admin-form {
+  margin-top: 0;
+  max-width: none;
+}
+.acct h3 {
+  font-size: 1.3rem;
+}
+/* availability message */
+.avail {
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+.avail.ok {
+  background: #e6f6ec;
+  color: #0a7a3d;
+}
+.avail.no {
+  background: #fde2e3;
+  color: #c0262d;
+}
+
+/* badges */
+.badge.walk {
+  background: #e6e0fb;
+  color: #4f35e8;
+}
+.badge.clash {
+  background: #fde2e3;
+  color: #c0262d;
+}
+
+/* booking calendar */
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.cal-head h2 {
+  margin: 0;
+}
+.cal-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+}
+.cal-legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 0.35rem;
+  background: var(--c);
+}
+.cal {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+.cal-dow {
+  padding: 0.5rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.8rem;
+  background: #f0ebe4;
+}
+.cal-day {
+  min-height: 108px;
+  padding: 0.35rem;
+  border-top: 1px solid #eee;
+  border-left: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.75rem;
+}
+.cal-day:nth-child(7n + 1) {
+  border-left: 0;
+}
+.cal-day.out {
+  background: #faf8f5;
+  color: #aaa;
+}
+.cal-num {
+  align-self: flex-start;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+}
+.cal-day.today .cal-num {
+  background: var(--purple);
+  color: #fff;
+  border-radius: 99px;
+}
+.cal-chip {
+  display: block;
+  padding: 0.1rem 0.4rem;
+  border-radius: 6px;
+  background: var(--c);
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.7rem;
+}
+.cal-chip.pending {
+  background: #fff;
+  color: var(--c);
+  border: 1.5px dashed var(--c);
+}
+.cal-chip:hover {
+  filter: brightness(1.1);
+}
+.cal-more {
+  font-size: 0.7rem;
+  color: #666;
+}
+
+/* dashboard reminders */
+.reminders {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.remind {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+}
+.remind h3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+}
+.remind h3 b {
+  background: var(--teal);
+  color: #fff;
+  border-radius: 99px;
+  min-width: 26px;
+  padding: 0 0.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  font-family: var(--sans);
+}
+.remind ul {
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+}
+.remind small {
+  display: block;
+  color: #666;
+}
+
+/* receipt */
+.receipt-wrap {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  width: 100%;
+}
+.receipt {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  padding: 2rem;
+}
+.rc-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 2px solid var(--teal);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+.rc-head img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+.rc-head strong {
+  display: block;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.6rem;
+  line-height: 1.1;
+}
+.rc-head small {
+  color: #555;
+}
+.rc-meta {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+.rc-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+.rc-table td {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+.rc-table td:last-child {
+  text-align: right;
+}
+.rc-total td {
+  font-weight: 700;
+}
+.rc-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  .receipt-wrap {
+    margin: 0;
+    max-width: none;
+    padding: 0;
+  }
+  .receipt {
+    border: 0;
+    padding: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .reminders {
+    grid-template-columns: 1fr;
+  }
+  .cal-day {
+    min-height: 72px;
+  }
+  .cal-chip {
+    font-size: 0.6rem;
+  }
+}

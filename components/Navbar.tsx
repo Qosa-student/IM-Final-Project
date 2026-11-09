@@ -76,12 +76,20 @@ export default function Navbar() {
           </Link>
         ))}
         {signedIn && !isAdmin && (
-          <Link
-            href="/account/bookings"
-            className={isActive("/account") ? "active" : ""}
-          >
-            My Bookings
-          </Link>
+          <>
+            <Link
+              href="/account/bookings"
+              className={isActive("/account/bookings") ? "active" : ""}
+            >
+              My Bookings
+            </Link>
+            <Link
+              href="/account/settings"
+              className={isActive("/account/settings") ? "active" : ""}
+            >
+              Settings
+            </Link>
+          </>
         )}
         {isAdmin && <Link href="/admin">Admin</Link>}
         {signedIn ? (
