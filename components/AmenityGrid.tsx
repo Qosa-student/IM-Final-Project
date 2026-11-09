@@ -1,32 +1,29 @@
-import {
-  Snowflake,
-  Sunset,
-  House,
-  Beer,
-  Mic,
-  CookingPot,
-  Flame,
-} from "lucide-react";
+import { amenityIcons, defaultAmenities } from "@/lib/amenities";
+import { createClient } from "@/lib/supabase/server";
 
-const items = [
-  { icon: Snowflake, label: "Air-conditioned Rooms" },
-  { icon: Sunset, label: "Great View of Sunset" },
-  { icon: House, label: "Open Cottages" },
-  { icon: Beer, label: "Mini Bar" },
-  { icon: Mic, label: "Karaoke Room" },
-  { icon: CookingPot, label: "Kitchen" },
-  { icon: Flame, label: "Grill" },
-];
+export default async function AmenityGrid() {
+  let items: { name: string; icon: string }[] = defaultAmenities;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("amenities")
+      .select("*")
+      .order("sort")
+      .order("id");
+    if (data?.length) items = data;
+  } catch {}
 
-export default function AmenityGrid() {
   return (
     <div className="amenities">
-      {items.map(({ icon: Icon, label }) => (
-        <div key={label} className="amenity">
-          <Icon size={44} strokeWidth={1.6} />
-          <span>{label}</span>
-        </div>
-      ))}
+      {items.map((a, i) => {
+        const Icon = amenityIcons[a.icon] ?? amenityIcons.palm;
+        return (
+          <div key={`${a.name}-${i}`} className="amenity">
+            <Icon size={44} strokeWidth={1.6} />
+            <span>{a.name}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -1,0 +1,46 @@
+import {
+  Beer,
+  Car,
+  CookingPot,
+  Flame,
+  House,
+  Mic,
+  ShowerHead,
+  Snowflake,
+  Sunset,
+  TreePalm,
+  Tv,
+  Umbrella,
+  Utensils,
+  Waves,
+  Wifi,
+  type LucideIcon,
+} from "lucide-react";
+
+export const amenityIcons: Record<string, LucideIcon> = {
+  snowflake: Snowflake,
+  sunset: Sunset,
+  house: House,
+  beer: Beer,
+  mic: Mic,
+  pot: CookingPot,
+  flame: Flame,
+  wifi: Wifi,
+  car: Car,
+  waves: Waves,
+  utensils: Utensils,
+  tv: Tv,
+  shower: ShowerHead,
+  palm: TreePalm,
+  umbrella: Umbrella,
+};
+
+export const defaultAmenities = [
+  { name: "Air-conditioned Rooms", icon: "snowflake" },
+  { name: "Great View of Sunset", icon: "sunset" },
+  { name: "Open Cottages", icon: "house" },
+  { name: "Mini Bar", icon: "beer" },
+  { name: "Karaoke Room", icon: "mic" },
+  { name: "Kitchen", icon: "pot" },
+  { name: "Grill", icon: "flame" },
+];

@@ -43,8 +43,7 @@ export default function Navbar() {
 
   async function logout() {
     await createClient().auth.signOut();
-    router.push("/");
-    router.refresh();
+    window.location.href = "/login";
   }
 
   const isActive = (href: string) =>

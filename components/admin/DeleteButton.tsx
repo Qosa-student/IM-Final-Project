@@ -2,12 +2,21 @@
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+type Table =
+  | "rooms"
+  | "messages"
+  | "bookings"
+  | "gallery_images"
+  | "reviews"
+  | "payments"
+  | "amenities";
+
 export default function DeleteButton({
   table,
   id,
   label,
 }: {
-  table: "rooms" | "messages" | "bookings" | "gallery_images" | "reviews";
+  table: Table;
   id: number;
   label: string;
 }) {

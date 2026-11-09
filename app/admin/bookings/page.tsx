@@ -8,35 +8,31 @@ type Booking = {
   email: string;
   check_in: string;
   check_out: string;
-  status: string;
   rooms: { name: string } | null;
 };
 
-const labels: Record<string, string> = {
-  pending: "Email reply",
-  confirmed: "Email confirmation",
-  declined: "Email decline",
-  cancelled: "Email cancellation",
-};
+type Kind = "request" | "confirmed" | "declined" | "cancelled";
 
-// Builds the Gmail draft. The wording depends on the booking's status.
-function gmailLink(b: Booking) {
+// Builds a Gmail draft for the chosen kind of message.
+function gmailLink(b: Booking, kind: Kind) {
   const room = b.rooms?.name ?? "your stay";
   const dates =
     b.check_out !== b.check_in ? `${b.check_in} to ${b.check_out}` : b.check_in;
 
-  let subject = "Your booking at D’Bay Samal";
-  let body = `Hi ${b.guest_name},
+  const drafts: Record<Kind, { subject: string; body: string }> = {
+    request: {
+      subject: "We received your booking request",
+      body: `Hi ${b.guest_name},
 
 Thank you for your booking request for ${room} (${dates}).
 
-We’ll confirm availability soon.
+Your request is now being confirmed. We’re checking availability and will get back to you soon.
 
-D’Bay Samal Beach & Resort`;
-
-  if (b.status === "confirmed") {
-    subject = "Your booking is confirmed";
-    body = `Hi ${b.guest_name},
+D’Bay Samal Beach & Resort`,
+    },
+    confirmed: {
+      subject: "Your booking is confirmed",
+      body: `Hi ${b.guest_name},
 
 Good news! Your booking for ${room} (${dates}) is confirmed.
 
@@ -48,30 +44,51 @@ Please bring a valid ID when you arrive.
 Need to change something? Call us at 09086776094 or reply to this email.
 
 We look forward to welcoming you!
-D’Bay Samal Beach & Resort`;
-  }
-
-  if (b.status === "declined") {
-    subject = "About your booking request";
-    body = `Hi ${b.guest_name},
+D’Bay Samal Beach & Resort`,
+    },
+    declined: {
+      subject: "About your booking request",
+      body: `Hi ${b.guest_name},
 
 Sorry, we can’t accommodate your request for ${room} (${dates}). Please contact us at 09086776094 to find other dates.
 
-D’Bay Samal Beach & Resort`;
-  }
-
-  if (b.status === "cancelled") {
-    subject = "Your booking has been cancelled";
-    body = `Hi ${b.guest_name},
+D’Bay Samal Beach & Resort`,
+    },
+    cancelled: {
+      subject: "Your booking has been cancelled",
+      body: `Hi ${b.guest_name},
 
 Your booking for ${room} (${dates}) has been cancelled.
 
 If this was a mistake or you’d like to book other dates, please call us at 09086776094 or reply to this email.
 
-D’Bay Samal Beach & Resort`;
-  }
+D’Bay Samal Beach & Resort`,
+    },
+  };
 
+  const { subject, body } = drafts[kind];
   return `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(b.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+function MailButton({
+  b,
+  kind,
+  label,
+}: {
+  b: Booking;
+  kind: Kind;
+  label: string;
+}) {
+  return (
+    <a
+      className="btn sm outline"
+      target="_blank"
+      rel="noreferrer"
+      href={gmailLink(b, kind)}
+    >
+      {label}
+    </a>
+  );
 }
 
 export default async function AdminBookings() {
@@ -85,8 +102,8 @@ export default async function AdminBookings() {
     <>
       <h2>Booking requests</h2>
       <p className="muted" style={{ marginBottom: "1rem" }}>
-        Set the status first, then click the Email button. The message matches
-        the status you chose.
+        Change the status, then use the email buttons to tell the guest. “Email
+        confirmation” unlocks once the booking is set to Confirmed.
       </p>
       <table>
         <thead>
@@ -102,46 +119,85 @@ export default async function AdminBookings() {
         </thead>
         <tbody>
           {bookings?.length ? (
-            bookings.map((b) => (
-              <tr key={b.id} className={b.status === "pending" ? "unread" : ""}>
-                <td>
-                  {b.guest_name}
-                  <br />
-                  <small>
-                    {b.email}
+            bookings.map((b) => {
+              const booking = b as unknown as Booking;
+              return (
+                <tr
+                  key={b.id}
+                  className={b.status === "pending" ? "unread" : ""}
+                >
+                  <td>
+                    {b.guest_name}
                     <br />
-                    {b.phone}
-                  </small>
-                </td>
-                <td>{b.rooms?.name ?? "Removed room"}</td>
-                <td>
-                  {fmtDate(b.check_in)}
-                  {b.check_out !== b.check_in && (
-                    <>
-                      <br />→ {fmtDate(b.check_out)}
-                    </>
-                  )}
-                </td>
-                <td>{b.guests}</td>
-                <td>{b.notes}</td>
-                <td>
-                  <StatusSelect id={b.id} status={b.status} />
-                </td>
-                <td>
-                  <div className="row-actions">
-                    <a
-                      className="btn sm outline"
-                      target="_blank"
-                      rel="noreferrer"
-                      href={gmailLink(b as unknown as Booking)}
-                    >
-                      {labels[b.status] ?? "Email"}
-                    </a>
-                    <DeleteButton table="bookings" id={b.id} label="booking" />
-                  </div>
-                </td>
-              </tr>
-            ))
+                    <small>
+                      {b.email}
+                      <br />
+                      {b.phone}
+                    </small>
+                  </td>
+                  <td>{b.rooms?.name ?? "Removed room"}</td>
+                  <td>
+                    {fmtDate(b.check_in)}
+                    {b.check_out !== b.check_in && (
+                      <>
+                        <br />→ {fmtDate(b.check_out)}
+                      </>
+                    )}
+                  </td>
+                  <td>{b.guests}</td>
+                  <td>{b.notes}</td>
+                  <td>
+                    <StatusSelect id={b.id} status={b.status} />
+                  </td>
+                  <td>
+                    <div className="row-actions">
+                      <MailButton
+                        b={booking}
+                        kind="request"
+                        label="Booking request received"
+                      />
+
+                      {b.status === "confirmed" ? (
+                        <MailButton
+                          b={booking}
+                          kind="confirmed"
+                          label="Confirm booking"
+                        />
+                      ) : (
+                        <span
+                          className="btn sm outline disabled"
+                          aria-disabled="true"
+                          title="Set the status to Confirmed first"
+                        >
+                          Confirm booking
+                        </span>
+                      )}
+
+                      {b.status === "declined" && (
+                        <MailButton
+                          b={booking}
+                          kind="declined"
+                          label="Decline booking"
+                        />
+                      )}
+                      {b.status === "cancelled" && (
+                        <MailButton
+                          b={booking}
+                          kind="cancelled"
+                          label="Cancel booking"
+                        />
+                      )}
+
+                      <DeleteButton
+                        table="bookings"
+                        id={b.id}
+                        label="booking"
+                      />
+                    </div>
+                  </td>
+                </tr>
+              );
+            })
           ) : (
             <tr>
               <td colSpan={7}>No booking requests yet.</td>

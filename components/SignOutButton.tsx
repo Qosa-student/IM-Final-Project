@@ -9,7 +9,7 @@ export default function SignOutButton() {
       className="btn sm"
       onClick={async () => {
         await createClient().auth.signOut();
-        router.push("/");
+        router.push("/login");
         router.refresh();
       }}
     >

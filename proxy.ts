@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Protects /admin: must be logged in AND have role = 'admin'.
+// Everyone must sign in first. Only /login is public. /admin is for admins only.
 export async function proxy(req: NextRequest) {
   let res = NextResponse.next({ request: req });
   const supabase = createServerClient(
@@ -20,18 +20,38 @@ export async function proxy(req: NextRequest) {
       },
     },
   );
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return NextResponse.redirect(new URL("/login", req.url));
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-  if (profile?.role !== "admin")
-    return NextResponse.redirect(new URL("/", req.url));
+  const path = req.nextUrl.pathname;
+
+  if (path === "/login") return res;
+
+  if (!user) {
+    const loginUrl = req.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    loginUrl.search = "";
+    if (path !== "/") loginUrl.searchParams.set("next", path);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (path.startsWith("/admin")) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    if (profile?.role !== "admin")
+      return NextResponse.redirect(new URL("/", req.url));
+  }
+
   return res;
 }
 
-export const config = { matcher: ["/admin/:path*"] };
+// Runs on every page, but skips Next.js internals and static files (images, icons, robots, sitemap).
+export const config = {
+  matcher: [
+    "/((?!_next/static|_next/image|.*\\.(?:png|jpg|jpeg|svg|webp|gif|ico|txt|xml)$).*)",
+  ],
+};
