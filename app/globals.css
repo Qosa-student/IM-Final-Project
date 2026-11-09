@@ -2129,3 +2129,11 @@ main {
   cursor: not-allowed;
   pointer-events: none;
 }
+/* login error text: plain red */
+.lp-msg.err {
+  color: #ff2d2d;
+  background: none;
+  border: 0;
+  padding: 0;
+  font-weight: 600;
+}

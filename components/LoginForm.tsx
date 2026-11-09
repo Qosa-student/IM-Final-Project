@@ -19,8 +19,13 @@ export default function LoginForm({ next }: { next: string }) {
     const email = String(f.get("email")),
       password = String(f.get("password"));
     const supabase = createClient();
-    setBusy(true);
     setMsg(null);
+
+    if (mode === "signup" && password !== String(f.get("confirm"))) {
+      return setMsg({ type: "err", text: "Password do not match." });
+    }
+
+    setBusy(true);
 
     if (mode === "signup") {
       const { data, error } = await supabase.auth.signUp({
@@ -71,6 +76,17 @@ export default function LoginForm({ next }: { next: string }) {
     router.refresh();
   }
 
+  const eye = (
+    <button
+      type="button"
+      className="lp-eye"
+      onClick={() => setShow(!show)}
+      aria-label={show ? "Hide password" : "Show password"}
+    >
+      {show ? <EyeOff size={20} /> : <Eye size={20} />}
+    </button>
+  );
+
   return (
     <>
       <h1 className="lp-pill">
@@ -107,15 +123,20 @@ export default function LoginForm({ next }: { next: string }) {
             minLength={6}
             required
           />
-          <button
-            type="button"
-            className="lp-eye"
-            onClick={() => setShow(!show)}
-            aria-label={show ? "Hide password" : "Show password"}
-          >
-            {show ? <EyeOff size={20} /> : <Eye size={20} />}
-          </button>
+          {eye}
         </label>
+        {mode === "signup" && (
+          <label className="lp-field">
+            <Lock size={20} />
+            <input
+              name="confirm"
+              type={show ? "text" : "password"}
+              placeholder="Confirm Password"
+              minLength={6}
+              required
+            />
+          </label>
+        )}
         <button className="lp-submit" disabled={busy}>
           <LogIn size={20} />
           {busy
